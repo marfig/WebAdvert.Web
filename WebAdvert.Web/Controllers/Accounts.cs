@@ -50,7 +50,7 @@ namespace WebAdvert.Web.Controllers
 
                 if (createdUser.Succeeded)
                 {
-                    RedirectToAction("Confirm");
+                    return RedirectToAction("Confirm");
                 }
             }
 
@@ -78,7 +78,7 @@ namespace WebAdvert.Web.Controllers
                 var result = await (_userManager as CognitoUserManager<CognitoUser>).ConfirmSignUpAsync(user, model.Code, true);
                 if (result.Succeeded)
                 {
-                    RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "Home");
                 }
                 else
                 {
@@ -88,6 +88,29 @@ namespace WebAdvert.Web.Controllers
                     }
                     return View(model);
                 }
+            }
+
+            return View(model);
+        }
+
+        public async Task<IActionResult> Login()
+        {
+            return View(new LoginModel());
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Login(LoginModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                var result = await _signInManager.PasswordSignInAsync(model.Email, model.Password, model.Rememberme, false);
+
+                if (result.Succeeded)
+                {
+                    return RedirectToAction("Index", "Home");
+                }
+
+                ModelState.AddModelError("LoginError", "Email and password do not match");
             }
 
             return View(model);

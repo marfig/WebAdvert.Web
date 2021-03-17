@@ -34,6 +34,11 @@ namespace WebAdvert.Web
                     RequireUppercase = false
                 };
             });
+
+            services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = "/Accounts/Login";
+            });
             services.AddControllersWithViews();
         }
 
