@@ -1,5 +1,6 @@
 ﻿using Amazon.AspNetCore.Identity.Cognito;
 using Amazon.Extensions.CognitoAuthentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -107,6 +108,10 @@ namespace WebAdvert.Web.Controllers
 
                 if (result.Succeeded)
                 {
+                    var user = await _userManager.FindByEmailAsync(model.Email);
+                    
+                    await _signInManager.SignInAsync(user, model.Rememberme);
+
                     return RedirectToAction("Index", "Home");
                 }
 
