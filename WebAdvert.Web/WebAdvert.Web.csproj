@@ -7,6 +7,8 @@
   <ItemGroup>
     <PackageReference Include="Amazon.AspNetCore.Identity.Cognito" Version="2.0.3" />
     <PackageReference Include="Amazon.Extensions.CognitoAuthentication" Version="2.0.3" />
+    <PackageReference Include="Marvin.AdvertApi.Models" Version="1.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="5.0.2" />
   </ItemGroup>
 
