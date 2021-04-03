@@ -3,9 +3,13 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Polly;
+using Polly.Extensions.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using WebAdvert.Web.ServiceClients;
 
@@ -41,7 +45,19 @@ namespace WebAdvert.Web
                 options.LoginPath = "/Accounts/Login";
             });
             services.AddControllersWithViews();
-            services.AddHttpClient<IAdvertApiClient, AdvertApiClient>();
+            services.AddHttpClient<IAdvertApiClient, AdvertApiClient>().AddPolicyHandler(GetRetryPolicy())
+                .AddPolicyHandler(GetCicuitBreakerPatternPolicy());
+        }
+
+        private IAsyncPolicy<HttpResponseMessage> GetCicuitBreakerPatternPolicy()
+        {
+            return HttpPolicyExtensions.HandleTransientHttpError().CircuitBreakerAsync(3, TimeSpan.FromSeconds(30));
+        }
+
+        private IAsyncPolicy<HttpResponseMessage> GetRetryPolicy()
+        {
+            return HttpPolicyExtensions.HandleTransientHttpError().OrResult(msg => msg.StatusCode == HttpStatusCode.NotFound)
+                .WaitAndRetryAsync(5, retryAttemp => TimeSpan.FromSeconds(Math.Pow(2, retryAttemp)));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
